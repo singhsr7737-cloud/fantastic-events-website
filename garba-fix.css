@@ -1,0 +1,39 @@
+/* GARBA section layout fix */
+.garba-hero{grid-template-columns:minmax(280px,.9fr) minmax(0,1.1fr)!important;gap:5vw!important;align-items:start!important}
+.garba-poster-wrap{min-width:0!important;width:100%!important}
+.garba-poster-image{width:100%!important;max-width:620px!important;margin:14px auto 0!important;overflow:hidden!important}
+.garba-poster-image img{display:block!important;width:100%!important;height:auto!important;max-height:none!important;object-fit:contain!important}
+.garba-copy{min-width:0!important;width:100%!important;padding-top:12px!important}
+.garba-copy h2{margin:12px 0 24px!important;line-height:.9!important}
+.garba-sub{margin:0!important;max-width:620px!important}
+.garba-meta{display:flex!important;flex-wrap:wrap!important;align-items:flex-start!important;gap:14px 28px!important;line-height:1.5!important}
+.garba-meta span{display:block!important;white-space:normal!important}
+.garba-highlights{display:flex!important;flex-wrap:wrap!important;align-items:center!important;gap:9px!important;margin:26px 0!important;line-height:1.4!important}
+.garba-highlights span{display:inline-block!important;white-space:normal!important;line-height:1.35!important}
+.garba-actions{display:flex!important;flex-wrap:wrap!important;align-items:center!important;gap:12px!important;margin-top:24px!important}
+.garba-actions .button{display:inline-flex!important;align-items:center!important;justify-content:center!important;white-space:nowrap!important}
+.garba-copy .ticket-note{margin-top:18px!important;line-height:1.5!important}
+
+@media(max-width:1100px) and (min-width:901px){
+  .garba{padding-left:5vw!important;padding-right:5vw!important}
+  .garba-hero{grid-template-columns:minmax(250px,.8fr) minmax(0,1.2fr)!important;gap:4vw!important}
+  .garba-copy h2{font-size:clamp(58px,8vw,92px)!important}
+  .garba-sub{font-size:17px!important}
+}
+
+@media(max-width:900px){
+  .garba-hero{grid-template-columns:1fr!important;gap:40px!important}
+  .garba-copy{padding-top:0!important}
+  .garba-poster-wrap{max-width:620px!important;margin:0 auto!important}
+  .garba-copy h2{font-size:clamp(52px,15vw,78px)!important;margin-top:0!important}
+  .garba-meta{display:grid!important;grid-template-columns:1fr 1fr!important;gap:14px 18px!important}
+  .garba-highlights{display:flex!important}
+  .garba-actions{display:grid!important;grid-template-columns:1fr!important}
+  .garba-actions .button{width:100%!important}
+}
+
+@media(max-width:450px){
+  .garba-copy h2{font-size:52px!important}
+  .garba-meta{grid-template-columns:1fr!important}
+  .garba-highlights span{font-size:9px!important}
+}
