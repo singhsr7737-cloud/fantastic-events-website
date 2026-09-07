@@ -1,3 +1,6 @@
+/* Exact hero background */
+.hero-media{background-image:url('hero.jpg')!important;background-size:cover!important;background-position:center!important}
+
 /* Mobile hero composition fix */
 @media (max-width: 900px){
   .hero{min-height:calc(100svh - 110px);height:auto;position:relative;padding:0 22px 38px;display:flex;align-items:flex-end;overflow:hidden}
