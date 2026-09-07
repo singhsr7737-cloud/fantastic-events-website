@@ -1,0 +1,22 @@
+/* Mobile hero composition fix */
+@media (max-width: 900px){
+  .hero{min-height:calc(100svh - 110px);height:auto;position:relative;padding:0 22px 38px;display:flex;align-items:flex-end;overflow:hidden}
+  .hero-media{position:absolute!important;inset:0!important;background-size:cover!important;background-position:center 58%!important;transform:scale(1.04)}
+  .hero-overlay{position:absolute!important;inset:0!important;background:linear-gradient(180deg,rgba(5,3,8,.38) 0%,rgba(5,3,8,.30) 35%,rgba(5,3,8,.78) 72%,rgba(5,3,8,.96) 100%)!important}
+  .hero-content{position:relative;z-index:2;width:100%;max-width:620px;padding-top:150px}
+  .hero .eyebrow{margin-bottom:16px;font-size:11px;letter-spacing:.16em}
+  .hero h1{margin:0 0 18px;font-size:clamp(38px,10.5vw,52px);line-height:.98;letter-spacing:-.035em}
+  .hero h1 span{display:inline;color:#d78cff}
+  .hero .lead{margin:0 0 24px;font-size:15px;line-height:1.5;max-width:560px}
+  .hero .actions{display:grid;grid-template-columns:1fr;gap:10px;margin:0}
+  .hero .actions .button{width:100%;min-height:54px;display:flex;align-items:center;justify-content:center}
+  .hero-meta{display:none!important}
+}
+@media(max-width:450px){
+  .hero{min-height:calc(100svh - 110px);padding:0 18px 30px}
+  .hero-media{background-position:center 62%!important}
+  .hero-content{padding-top:125px}
+  .hero .eyebrow{font-size:10px;margin-bottom:14px}
+  .hero h1{font-size:39px;line-height:1}
+  .hero .lead{font-size:14px;line-height:1.48;margin-bottom:22px}
+}
