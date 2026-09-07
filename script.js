@@ -24,7 +24,7 @@ function buildGallery(filter='all') {
       if (n % 9 === 0) figure.classList.add('wide');
       const img = document.createElement('img');
       img.loading = n < 9 ? 'eager' : 'lazy';
-      img.src = `assets/media/${cat}/${String(i).padStart(2,'0')}.jpg`;
+      img.src = `${cat}/${String(i).padStart(2,'0')}.jpg`;
       img.alt = `${labels[cat]} by FANTASTIC`;
       const cap = document.createElement('figcaption'); cap.textContent = labels[cat];
       figure.append(img,cap); gallery.appendChild(figure); n++;
@@ -36,7 +36,7 @@ function buildVideos() {
   for (let i=1;i<=6;i++) {
     const card=document.createElement('article'); card.className='video-card';
     const video=document.createElement('video'); video.controls=true; video.preload='metadata'; video.playsInline=true;
-    video.src=`assets/media/videos/showreel-${String(i).padStart(2,'0')}.mp4`;
+    video.src=`videos/showreel-${String(i).padStart(2,'0')}.mp4`;
     const p=document.createElement('p'); p.textContent=`FANTASTIC — Event Showreel ${String(i).padStart(2,'0')}`;
     card.append(video,p); videoGrid.appendChild(card);
   }
@@ -48,8 +48,6 @@ document.querySelectorAll('.filter').forEach(btn=>btn.addEventListener('click',(
 }));
 document.querySelectorAll('img').forEach(img=>img.addEventListener('error',()=>console.log('Media could not be loaded:',img.src)));
 
-
-// GARBA 2026 ticket booking preview
 const ticketOptions = document.querySelectorAll('.ticket-option');
 const selectedTicketEl = document.getElementById('selectedTicket');
 const ticketQtyEl = document.getElementById('ticketQty');
