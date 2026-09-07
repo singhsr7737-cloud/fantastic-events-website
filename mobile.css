@@ -1,0 +1,54 @@
+/* Mobile & small-screen polish */
+html,body{width:100%;overflow-x:hidden}
+img,video{max-width:100%;height:auto}
+@media(max-width:900px){
+  .nav{padding:0 18px}
+  .brand img{width:112px;max-width:42vw}
+  .hero{min-height:92vh;padding:115px 22px 55px;align-items:flex-end}
+  .hero-content{width:100%}
+  .hero h1{font-size:clamp(38px,11vw,52px);line-height:.98}
+  .lead{font-size:15px;line-height:1.55}
+  .section{padding:68px 20px}
+  .section-head h2{font-size:clamp(38px,10vw,58px)}
+  .service-grid{grid-template-columns:1fr}
+  .service-grid article{padding:26px 22px}
+  .filters{overflow-x:auto;flex-wrap:nowrap;padding-bottom:6px;-webkit-overflow-scrolling:touch}
+  .filter{flex:0 0 auto;white-space:nowrap}
+  .gallery{columns:2 140px;column-gap:8px}
+  .gallery figure{margin-bottom:8px}
+  .video-grid{grid-template-columns:1fr;gap:12px}
+  .statement{min-height:52vh;padding:60px 20px}
+  .statement strong{font-size:clamp(90px,25vw,170px)}
+  .contact-grid{gap:30px}
+
+  /* Featured event */
+  .garba{padding:62px 18px}
+  .garba-hero{grid-template-columns:1fr;gap:38px}
+  .garba-poster-wrap{width:100%;max-width:560px;margin:0 auto}
+  .garba-poster-image{width:100%;margin-top:14px;border:1px solid #3a3040;border-radius:14px;overflow:hidden;box-shadow:0 20px 55px rgba(0,0,0,.45);background:#111}
+  .garba-poster-image img{display:block;width:100%;height:auto;object-fit:contain}
+  .garba-copy{width:100%}
+  .garba-copy h2{font-size:clamp(48px,15vw,76px);line-height:.9;letter-spacing:-.04em;word-break:normal}
+  .garba-copy h2 em{display:block;margin-top:9px;font-size:.72em;line-height:1}
+  .garba-sub{font-size:16px;line-height:1.55}
+  .garba-meta{gap:12px 18px;margin-top:24px;font-size:9px;line-height:1.5}
+  .garba-highlights{gap:7px;margin:22px 0}
+  .garba-highlights span{font-size:9px;padding:8px 9px}
+  .garba-actions{display:grid;grid-template-columns:1fr;gap:10px;margin-top:22px}
+  .garba-actions .button{width:100%;text-align:center;padding:14px 16px}
+  .garba-copy .ticket-note{font-size:11px;text-align:center;margin-top:16px}
+}
+@media(max-width:450px){
+  .brand img{width:100px}
+  .hero{padding-left:18px;padding-right:18px}
+  .hero h1{font-size:40px}
+  .actions{width:100%}
+  .actions .button{width:100%;text-align:center}
+  .section{padding-left:16px;padding-right:16px}
+  .gallery{columns:2 120px}
+  .garba{padding-left:14px;padding-right:14px}
+  .garba-copy h2{font-size:52px}
+  .garba-poster-image{border-radius:10px}
+  .garba-meta{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .garba-meta span{overflow-wrap:anywhere}
+}
