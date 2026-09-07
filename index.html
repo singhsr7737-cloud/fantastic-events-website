@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FANTASTIC — Events 'N' Wedding Planner</title>
+  <meta name="description" content="FANTASTIC Events 'N' Wedding Planner — luxury weddings, décor, stage production, corporate and private events.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="nav">
+    <a class="brand" href="#home"><img src="assets/logo.png" alt="FANTASTIC Events 'N' Wedding Planner"></a>
+    <nav>
+      <a href="#home">Home</a><a href="#about">Our Story</a><a href="#services">Services</a><a href="#work">Our Work</a><a href="#showreel">Showreel</a><a href="#garba">Garba 2026</a><a href="#contact">Contact</a>
+    </nav>
+    <a class="nav-cta" href="https://wa.me/919929692498?text=Hello%20FANTASTIC%20Events%2C%20I%20would%20like%20to%20plan%20an%20event.">Plan Your Event</a>
+    <button class="menu" aria-label="Open menu">☰</button>
+  </header>
+
+  <main id="home">
+    <section class="hero">
+      <div class="hero-media"></div><div class="hero-overlay"></div>
+      <div class="hero-content">
+        <p class="eyebrow">EVENTS 'N' WEDDING PLANNER</p>
+        <h1>We don't just plan events.<br><span>We create experiences.</span></h1>
+        <p class="lead">Luxury weddings, spectacular décor and celebrations designed around your story — from concept to final detail.</p>
+        <div class="actions"><a class="button primary" href="#work">Explore Our Work</a><a class="button ghost" href="#contact">Let's Create Together</a></div>
+      </div>
+      <div class="hero-meta"><span>01</span><i></i><span>FANTASTIC</span></div>
+    </section>
+
+    <section id="about" class="story section">
+      <div class="section-kicker">OUR STORY</div>
+      <div class="story-grid"><div><h2>18+ years of<br><em>creating celebrations.</em></h2></div><div><p class="big-copy">From intimate gatherings to grand wedding spectacles, every FANTASTIC celebration is built around one idea: make the moment unforgettable.</p><p>Our work brings together concept, décor, production, lighting and the details that turn a venue into an experience.</p></div></div>
+    </section>
+
+    <section id="services" class="services section">
+      <div class="section-head"><div><div class="section-kicker">WHAT WE CREATE</div><h2>Designed to be <em>remembered.</em></h2></div><p>One team. One vision. Every detail handled.</p></div>
+      <div class="service-grid">
+        <article><span>01</span><h3>Weddings</h3><p>Beautifully planned celebrations, from intimate ceremonies to spectacular wedding productions.</p></article>
+        <article><span>02</span><h3>Décor & Styling</h3><p>Floral installations, tablescapes, entrances and bespoke environments.</p></article>
+        <article><span>03</span><h3>Stage & Production</h3><p>Stage design, lighting, sound and production that transform the venue.</p></article>
+        <article><span>04</span><h3>Private Events</h3><p>Engagements, birthdays, anniversaries and celebrations with personality.</p></article>
+        <article><span>05</span><h3>Corporate Events</h3><p>Professional experiences designed for launches, conferences and brand moments.</p></article>
+        <article><span>06</span><h3>Special Experiences</h3><p>Custom installations and creative concepts made especially for your event.</p></article>
+      </div>
+    </section>
+
+    <section id="work" class="work section">
+      <div class="section-head"><div><div class="section-kicker">OUR WORK</div><h2>A glimpse of<br><em>Fantastic.</em></h2></div><p>Real celebrations. Real memories. Now organised by experience.</p></div>
+      <div class="filters" role="tablist" aria-label="Portfolio categories">
+        <button class="filter active" data-filter="all">All Work</button><button class="filter" data-filter="weddings">Weddings</button><button class="filter" data-filter="decor">Décor</button><button class="filter" data-filter="production">Stage & Production</button><button class="filter" data-filter="corporate">Corporate</button><button class="filter" data-filter="celebrations">Celebrations</button>
+      </div>
+      <div class="gallery" id="gallery"></div>
+      <p class="gallery-note">A curated selection from the FANTASTIC event archive. More event stories can be added as new projects are photographed.</p>
+    </section>
+
+    <section id="showreel" class="showreel section">
+      <div class="section-head"><div><div class="section-kicker">SHOWREEL</div><h2>See the<br><em>experience.</em></h2></div><p>Motion, atmosphere, production and the details behind the final look.</p></div>
+      <div class="video-grid" id="videoGrid"></div>
+    </section>
+
+
+    <section id="garba" class="garba section">
+      <div class="garba-hero">
+        <div class="garba-copy">
+          <div class="section-kicker">UPCOMING EVENT</div>
+          <h2>GARBA <em>2026</em></h2>
+          <p class="garba-sub">A grand night of music, dance, lights and celebration — presented by FANTASTIC.</p>
+          <div class="garba-meta"><span>DATE — COMING SOON</span><span>VENUE — COMING SOON</span></div>
+        </div>
+        <div class="ticket-panel">
+          <div class="section-kicker">TICKETS</div>
+          <h3>Reserve your entry</h3>
+          <div class="ticket-options" id="ticketOptions">
+            <button class="ticket-option active" data-name="Early Bird Pass" data-price="499"><span>Early Bird</span><strong>₹499</strong></button>
+            <button class="ticket-option" data-name="Regular Pass" data-price="699"><span>Regular</span><strong>₹699</strong></button>
+            <button class="ticket-option" data-name="Couple Pass" data-price="1199"><span>Couple</span><strong>₹1,199</strong></button>
+            <button class="ticket-option" data-name="VIP Pass" data-price="1999"><span>VIP</span><strong>₹1,999</strong></button>
+          </div>
+          <div class="ticket-summary"><div><span>Selected</span><strong id="selectedTicket">Early Bird Pass</strong></div><div class="qty"><button id="minusTicket" type="button">−</button><strong id="ticketQty">1</strong><button id="plusTicket" type="button">+</button></div></div>
+          <div class="ticket-total"><span>Total</span><strong id="ticketTotal">₹499</strong></div>
+          <button class="button primary ticket-book" id="openBooking" type="button">BOOK TICKETS</button>
+          <p class="ticket-note">Secure payment and QR ticket verification will be connected before launch.</p>
+        </div>
+      </div>
+
+      <div class="booking-modal" id="bookingModal" aria-hidden="true">
+        <div class="modal-backdrop" id="closeBooking"></div>
+        <div class="booking-card" role="dialog" aria-modal="true" aria-labelledby="bookingTitle">
+          <button class="modal-close" id="closeBookingX" type="button" aria-label="Close">×</button>
+          <div class="section-kicker">GARBA 2026</div>
+          <h3 id="bookingTitle">Complete your booking</h3>
+          <form id="bookingForm">
+            <input id="bookingName" required placeholder="Full Name" autocomplete="name">
+            <input id="bookingPhone" required placeholder="Mobile Number" inputmode="tel" autocomplete="tel">
+            <input id="bookingEmail" required type="email" placeholder="Email Address" autocomplete="email">
+            <div class="form-booking-summary"><span id="formTicketName">Early Bird Pass × 1</span><strong id="formTicketTotal">₹499</strong></div>
+            <button class="button primary" type="submit">CONTINUE TO PAYMENT</button>
+          </form>
+          <div class="demo-payment" id="demoPayment" hidden>
+            <div class="success-icon">✓</div>
+            <h4>Booking created</h4>
+            <p>Demo booking ID: <strong id="bookingId"></strong></p>
+            <div class="qr-box"><div id="qrCode"></div></div>
+            <p class="ticket-note">This is a booking-system preview. Live payment, database storage and venue QR check-in will be connected after the payment account and event details are confirmed.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="statement"><div class="orb"></div><p>YEARS OF EXPERIENCE</p><strong>18+</strong><h2>Thousands of moments.<br><em>One FANTASTIC legacy.</em></h2></section>
+
+    <section id="contact" class="contact section">
+      <div class="section-kicker">LET'S TALK</div>
+      <div class="contact-grid"><div><h2>Have a celebration<br>in mind?</h2><p>Tell us what you're imagining. Let's turn it into something extraordinary.</p></div><div class="contact-card">
+        <a href="tel:+919929692498"><small>CALL / WHATSAPP</small><strong>+91 9929692498</strong></a>
+        <a href="tel:+919509566606"><small>CALL / WHATSAPP</small><strong>+91 9509566606</strong></a>
+        <a href="https://www.instagram.com/fantasticevents_og/" target="_blank" rel="noopener"><small>INSTAGRAM</small><strong>@fantasticevents_og</strong></a>
+      </div></div>
+    </section>
+  </main>
+  <footer><img src="assets/logo.png" alt="FANTASTIC"><p>Events 'N' Wedding Planner</p><span>© 2026 FANTASTIC. All rights reserved.</span></footer>
+  <script src="script.js"></script>
+</body>
+</html>
