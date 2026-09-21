@@ -38,4 +38,4 @@ const server=http.createServer(async(req,res)=>{
  const filePath=safePath(requestPath);if(!filePath)return res.writeHead(403),res.end('Forbidden');
  fs.stat(filePath,(err,stat)=>{if(err||!stat.isFile()){const index=path.join(root,'index.html');return fs.readFile(index,(x,d)=>{if(x){res.writeHead(500);return res.end('Server error');}res.writeHead(200,{'Content-Type':types['.html']});res.end(d);});}fs.readFile(filePath,(x,d)=>{if(x){res.writeHead(500);return res.end('Server error');}const ext=path.extname(filePath).toLowerCase();res.writeHead(200,{'Content-Type':types[ext]||'application/octet-stream','Cache-Control':ext==='.html'?'no-cache':'public, max-age=86400'});res.end(d);});});
 });
-server.listen(port,'0.0.0.0',()=>console.log('FANTASTIC website listening on port '+port));
+initDb().then(()=>server.listen(port,'0.0.0.0',()=>console.log('FANTASTIC website listening on port '+port))).catch(e=>{console.error('Database initialization failed:',e.message);server.listen(port,'0.0.0.0',()=>console.log('FANTASTIC website listening on port '+port));});
