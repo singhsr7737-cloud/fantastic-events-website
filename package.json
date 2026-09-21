@@ -10,6 +10,7 @@
     "node": ">=20"
   },
   "dependencies": {
-    "razorpay": "^2.9.6"
+    "razorpay": "^2.9.6",
+    "pg": "^8.16.3"
   }
 }
