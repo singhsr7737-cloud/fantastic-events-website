@@ -13,7 +13,32 @@ const pool=process.env.DATABASE_URL?new Pool({connectionString:process.env.DATAB
 async function initDb(){if(!pool)return;await pool.query(`CREATE TABLE IF NOT EXISTS garba_bookings (booking_id TEXT PRIMARY KEY, payment_id TEXT UNIQUE NOT NULL, order_id TEXT NOT NULL, holder_name TEXT NOT NULL, phone TEXT NOT NULL, email TEXT NOT NULL, pass_type TEXT NOT NULL, quantity INTEGER NOT NULL, amount INTEGER NOT NULL, used_at TIMESTAMPTZ NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW())`);}
 function json(res,status,data){res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});res.end(JSON.stringify(data));}
 function readBody(req){return new Promise((resolve,reject)=>{let body='';req.on('data',c=>{body+=c;if(body.length>100000)req.destroy();});req.on('end',()=>{try{resolve(JSON.parse(body||'{}'));}catch(e){reject(e);}});req.on('error',reject);});}
+async function handleWhatsAppWebhook(req,res){
+ if(req.method==='GET'){
+  const u=new URL(req.url,'http://localhost');
+  const mode=u.searchParams.get('hub.mode');
+  const token=u.searchParams.get('hub.verify_token');
+  const challenge=u.searchParams.get('hub.challenge');
+  if(mode==='subscribe' && token && process.env.WHATSAPP_VERIFY_TOKEN && token===process.env.WHATSAPP_VERIFY_TOKEN){
+   res.writeHead(200,{'Content-Type':'text/plain; charset=utf-8'});
+   return res.end(challenge||'');
+  }
+  return res.writeHead(403),res.end('Forbidden');
+ }
+ if(req.method==='POST'){
+  try{
+   const body=await readBody(req);
+   console.log('WhatsApp webhook event:',JSON.stringify(body));
+  }catch(e){
+   console.error('WhatsApp webhook parse error:',e.message);
+  }
+  return json(res,200,{received:true});
+ }
+ return res.writeHead(405),res.end('Method Not Allowed');
+}
+
 async function api(req,res){
+ if(req.url&&req.url.startsWith('/api/whatsapp/webhook'))return handleWhatsAppWebhook(req,res);
  if(req.method==='GET'&&req.url==='/api/payment-status')return json(res,200,{configured:!!(process.env.RAZORPAY_KEY_ID&&process.env.RAZORPAY_KEY_SECRET),keyIdPresent:!!process.env.RAZORPAY_KEY_ID,keyPrefix:process.env.RAZORPAY_KEY_ID?String(process.env.RAZORPAY_KEY_ID).slice(0,8):null,secretPresent:!!process.env.RAZORPAY_KEY_SECRET});
  if(!process.env.RAZORPAY_KEY_ID||!process.env.RAZORPAY_KEY_SECRET)return json(res,500,{error:'Payment gateway is not configured yet.'});
  if(req.method==='POST'&&req.url==='/api/create-order'){
