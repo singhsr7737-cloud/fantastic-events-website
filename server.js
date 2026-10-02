@@ -15,27 +15,7 @@ async function initDb(){if(!pool)return;await pool.query(`CREATE TABLE IF NOT EX
 function json(res,status,data){res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});res.end(JSON.stringify(data));}
 function readBody(req){return new Promise((resolve,reject)=>{let body='';req.on('data',c=>{body+=c;if(body.length>100000)req.destroy();});req.on('end',()=>{try{resolve(JSON.parse(body||'{}'));}catch(e){reject(e);}});req.on('error',reject);});}
 async function handleWhatsAppWebhook(req,res){
- if(req.method==='GET'){
-  const u=new URL(req.url,'http://localhost');
-  const mode=u.searchParams.get('hub.mode');
-  const token=u.searchParams.get('hub.verify_token');
-  const challenge=u.searchParams.get('hub.challenge');
-  if(mode==='subscribe' && token && process.env.WHATSAPP_VERIFY_TOKEN && token===process.env.WHATSAPP_VERIFY_TOKEN){
-   res.writeHead(200,{'Content-Type':'text/plain; charset=utf-8'});
-   return res.end(challenge||'');
-  }
-  return res.writeHead(403),res.end('Forbidden');
- }
- if(req.method==='POST'){
-  try{
-   const body=await readBody(req);
-   console.log('WhatsApp webhook event:',JSON.stringify(body));
-  }catch(e){
-   console.error('WhatsApp webhook parse error:',e.message);
-  }
-  return json(res,200,{received:true});
- }
- return res.writeHead(405),res.end('Method Not Allowed');
+ return whatsapp.webhook(req,res,pool);
 }
 
 async function api(req,res){
