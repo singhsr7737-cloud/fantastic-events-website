@@ -7,7 +7,7 @@ const ticketQtyEl=document.getElementById('ticketQty');
 const ticketTotalEl=document.getElementById('ticketTotal');
 const bookingForm=document.getElementById('bookingForm');
 const statusEl=document.getElementById('bookingStatus');
-let selectedTicket={name:'Single Female Pass',price:299};
+let selectedTicket={name:'Individual Pass',price:499};
 let ticketQty=1;
 function updateTicketUI(){const total=selectedTicket.price*ticketQty;selectedTicketEl.textContent=selectedTicket.name;ticketQtyEl.textContent=ticketQty;ticketTotalEl.textContent='₹'+total.toLocaleString('en-IN');}
 function closeTicketModal(){bookingModal.classList.remove('open');bookingModal.setAttribute('aria-hidden','true');document.body.classList.remove('modal-open');}
