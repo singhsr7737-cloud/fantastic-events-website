@@ -12,6 +12,28 @@ const prices={'Single Female Pass':299,'Couple Pass':499,'Family Pass':799};
 const razorpay=()=>new Razorpay({key_id:process.env.RAZORPAY_KEY_ID,key_secret:process.env.RAZORPAY_KEY_SECRET});
 const pool=process.env.DATABASE_URL?new Pool({connectionString:process.env.DATABASE_URL,ssl:{rejectUnauthorized:false}}):null;
 async function initDb(){if(!pool)return;await pool.query(`CREATE TABLE IF NOT EXISTS garba_bookings (booking_id TEXT PRIMARY KEY, payment_id TEXT UNIQUE NOT NULL, order_id TEXT NOT NULL, holder_name TEXT NOT NULL, phone TEXT NOT NULL, email TEXT NOT NULL, pass_type TEXT NOT NULL, quantity INTEGER NOT NULL, amount INTEGER NOT NULL, used_at TIMESTAMPTZ NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW())`);}
+async function logWhatsAppPhoneStatus(){
+ try{
+  const token=process.env.WHATSAPP_ACCESS_TOKEN;
+  const phoneId=process.env.WHATSAPP_PHONE_NUMBER_ID;
+  const version=process.env.WHATSAPP_GRAPH_VERSION||'v23.0';
+  if(!token||!phoneId)return;
+  const r=await fetch('https://graph.facebook.com/'+version+'/'+phoneId+'?fields=id,display_phone_number,verified_name,code_verification_status,quality_rating,platform_type',{
+   headers:{Authorization:'Bearer '+token}
+  });
+  const d=await r.json().catch(()=>({}));
+  console.log('WhatsApp phone status:',JSON.stringify({
+   httpStatus:r.status,
+   id:d.id,
+   display_phone_number:d.display_phone_number,
+   verified_name:d.verified_name,
+   code_verification_status:d.code_verification_status,
+   quality_rating:d.quality_rating,
+   platform_type:d.platform_type,
+   error:d.error?.message||null
+  }));
+ }catch(e){console.error('WhatsApp phone status check error:',e.message);}
+}
 function json(res,status,data){res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});res.end(JSON.stringify(data));}
 function readBody(req){return new Promise((resolve,reject)=>{let body='';req.on('data',c=>{body+=c;if(body.length>100000)req.destroy();});req.on('end',()=>{try{resolve(JSON.parse(body||'{}'));}catch(e){reject(e);}});req.on('error',reject);});}
 async function handleWhatsAppWebhook(req,res){
@@ -46,4 +68,4 @@ const server=http.createServer(async(req,res)=>{
  const filePath=safePath(requestPath);if(!filePath)return res.writeHead(403),res.end('Forbidden');
  fs.stat(filePath,(err,stat)=>{if(err||!stat.isFile()){const index=path.join(root,'index.html');return fs.readFile(index,(x,d)=>{if(x){res.writeHead(500);return res.end('Server error');}res.writeHead(200,{'Content-Type':types['.html']});res.end(d);});}fs.readFile(filePath,(x,d)=>{if(x){res.writeHead(500);return res.end('Server error');}const ext=path.extname(filePath).toLowerCase();res.writeHead(200,{'Content-Type':types[ext]||'application/octet-stream','Cache-Control':ext==='.html'?'no-cache':'public, max-age=86400'});res.end(d);});});
 });
-initDb().then(()=>server.listen(port,'0.0.0.0',()=>console.log('FANTASTIC website listening on port '+port))).catch(e=>{console.error('Database initialization failed:',e.message);server.listen(port,'0.0.0.0',()=>console.log('FANTASTIC website listening on port '+port));});
+initDb().then(()=>server.listen(port,'0.0.0.0',async()=>{console.log('FANTASTIC website listening on port '+port);await logWhatsAppPhoneStatus();})).catch(e=>{console.error('Database initialization failed:',e.message);server.listen(port,'0.0.0.0',async()=>{console.log('FANTASTIC website listening on port '+port);await logWhatsAppPhoneStatus();});});
