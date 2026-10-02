@@ -20,6 +20,7 @@ async function handleWhatsAppWebhook(req,res){
 
 async function api(req,res){
  if(req.url&&req.url.startsWith('/api/whatsapp/webhook'))return handleWhatsAppWebhook(req,res);
+ if(req.method==='GET'&&req.url.startsWith('/api/ticket-pdf'))return whatsapp.pdf(req,res,pool);
  if(req.method==='GET'&&req.url==='/api/payment-status')return json(res,200,{configured:!!(process.env.RAZORPAY_KEY_ID&&process.env.RAZORPAY_KEY_SECRET),keyIdPresent:!!process.env.RAZORPAY_KEY_ID,keyPrefix:process.env.RAZORPAY_KEY_ID?String(process.env.RAZORPAY_KEY_ID).slice(0,8):null,secretPresent:!!process.env.RAZORPAY_KEY_SECRET});
  if(!process.env.RAZORPAY_KEY_ID||!process.env.RAZORPAY_KEY_SECRET)return json(res,500,{error:'Payment gateway is not configured yet.'});
  if(req.method==='POST'&&req.url==='/api/create-order'){
