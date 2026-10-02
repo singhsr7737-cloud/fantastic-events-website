@@ -41,7 +41,7 @@ function openWhatsAppTicket(){
  const qty=document.getElementById('passQty').textContent.trim();
  const phoneInput=document.getElementById('customerPhone');
  const customerPhone=(phoneInput&&phoneInput.value||'').replace(/\D/g,'');
- const target=customerPhone.length===10?'91'+customerPhone:'919929692498';
+ const target='919929692498';
  const message='Hello FANTASTIC Events, my GARBA Raas-Rang 18 booking is confirmed.\n\nBooking ID: '+id+'\nHolder: '+holder+'\nPass: '+type+'\nQuantity: '+qty+'\nDate: 19 October 2026\nVenue: Kesargarh Haweli, Chomu\nTime: 5:00 PM - 11:00 PM';
  window.location.href='https://wa.me/'+target+'?text='+encodeURIComponent(message);
 }
