@@ -8,7 +8,7 @@ const whatsapp=require('./whatsapp');
 const root=__dirname;
 const port=process.env.PORT||3000;
 const types={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'application/javascript; charset=utf-8','.json':'application/json; charset=utf-8','.jpg':'image/jpeg','.jpeg':'image/jpeg','.png':'image/png','.webp':'image/webp','.svg':'image/svg+xml','.mp4':'video/mp4','.mov':'video/quicktime','.ico':'image/x-icon'};
-const prices={'Individual Pass':499,'Couple Pass':999,'VIP Pass':1999};
+const prices={'Single Female Pass':299,'Couple Pass':499,'Family Pass':799};
 const razorpay=()=>new Razorpay({key_id:process.env.RAZORPAY_KEY_ID,key_secret:process.env.RAZORPAY_KEY_SECRET});
 const pool=process.env.DATABASE_URL?new Pool({connectionString:process.env.DATABASE_URL,ssl:{rejectUnauthorized:false}}):null;
 async function initDb(){if(!pool)return;await pool.query(`CREATE TABLE IF NOT EXISTS garba_bookings (booking_id TEXT PRIMARY KEY, payment_id TEXT UNIQUE NOT NULL, order_id TEXT NOT NULL, holder_name TEXT NOT NULL, phone TEXT NOT NULL, email TEXT NOT NULL, pass_type TEXT NOT NULL, quantity INTEGER NOT NULL, amount INTEGER NOT NULL, used_at TIMESTAMPTZ NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW())`);}
