@@ -6,7 +6,7 @@
 <section id="loginCard" class="card"><h2>Staff Login</h2><p>Enter the admin password to view ticket bookings.</p><form id="loginForm"><input id="password" type="password" placeholder="Admin password" autocomplete="current-password" required><button>LOGIN</button><p id="loginMsg"></p></form></section>
 <section id="dashboard" hidden>
 <div class="stats"><div><span>Total Bookings</span><strong id="total">0</strong></div><div><span>Tickets Sold</span><strong id="tickets">0</strong></div><div><span>Revenue</span><strong id="revenue">₹0</strong></div><div><span>Entries Used</span><strong id="used">0</strong></div></div>
-<div class="toolbar"><h2>Bookings</h2><div><button id="refresh">REFRESH</button><button id="export">EXPORT CSV</button></div></div>
+<div class="toolbar"><h2>WhatsApp</h2><div><button id="connectWhatsApp" type="button">CONNECT WHATSAPP BUSINESS</button></div></div><p id="whatsappMsg"></p><div class="toolbar"><h2>Bookings</h2><div><button id="refresh">REFRESH</button><button id="export">EXPORT CSV</button></div></div>
 <div class="table-wrap"><table><thead><tr><th>Booking ID</th><th>Holder</th><th>Phone</th><th>Pass</th><th>Qty</th><th>Amount</th><th>Status</th><th>Booked At</th></tr></thead><tbody id="rows"></tbody></table></div>
 <p id="dashMsg"></p></section>
-</main><script src="admin.js?v=1"></script></body></html>
+</main><script>window.fbAsyncInit=function(){FB.init({appId:"1074711985340491",cookie:true,xfbml:false,version:"v24.0"});};</script><script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script><script src="admin.js?v=2"></script></body></html>
