@@ -34,7 +34,7 @@ if(connectWhatsApp){
       config_id:'258469885869946',
       response_type:'code',
       override_default_response_type:true,
-      auth_type:'rerequest',extras:{setup:{},sessionInfoVersion:'3',featureType:'whatsapp_business_app_onboarding'}
+      auth_type:'rerequest',extras:{setup:{},sessionInfoVersion:'3',featureType:'whatsapp_business_app_onboarding',version:'v4'}
     });
   });
 }
