@@ -9,7 +9,7 @@ window.addEventListener('message',async function(event){
   try{data=typeof event.data==='string'?JSON.parse(event.data):event.data;}catch(e){return;}
   if(data?.type!=='WA_EMBEDDED_SIGNUP') return;
   if(data?.event==='CANCEL'||data?.event==='ERROR'){showWhatsAppMessage('WhatsApp setup was cancelled or returned an error.');return;}
-  if(data?.event==='FINISH_WHATSAPP_BUSINESS_APP_ONBOARDING'){
+  if(data?.event==='FINISH'||data?.event==='FINISH_WHATSAPP_BUSINESS_APP_ONBOARDING'){
     showWhatsAppMessage('Coexistence completed. Finalizing the connection...',true);
     try{
       const r=await fetch('/api/whatsapp/embedded-signup',{method:'POST',headers:{'Content-Type':'application/json','x-admin-password':adminPassword},body:JSON.stringify({code:window.__waSignupCode||'',session:data.data||{},event:data.event,version:data.version})});
@@ -34,7 +34,7 @@ if(connectWhatsApp){
       config_id:'258469885869946',
       response_type:'code',
       override_default_response_type:true,
-      extras:{setup:{},featureType:'whatsapp_business_app_onboarding',sessionInfoVersion:'3'}
+      auth_type:'rerequest',extras:{setup:{}}
     });
   });
 }
