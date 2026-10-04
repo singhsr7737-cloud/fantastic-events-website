@@ -36,12 +36,36 @@ async function logWhatsAppPhoneStatus(){
 }
 function json(res,status,data){res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});res.end(JSON.stringify(data));}
 function readBody(req){return new Promise((resolve,reject)=>{let body='';req.on('data',c=>{body+=c;if(body.length>100000)req.destroy();});req.on('end',()=>{try{resolve(JSON.parse(body||'{}'));}catch(e){reject(e);}});req.on('error',reject);});}
+async function handleWhatsAppEmbeddedSignup(req,res){
+  try{
+    const body=await readBody(req);
+    const code=String(body.code||'').trim();
+    if(!code)return json(res,400,{error:'Missing Embedded Signup authorization code.'});
+    if(process.env.ADMIN_PASSWORD && req.headers['x-admin-password']!==process.env.ADMIN_PASSWORD)return json(res,401,{error:'Unauthorized'});
+    const appId=process.env.META_APP_ID||'1074711985340491';
+    const appSecret=process.env.META_APP_SECRET;
+    if(!appSecret)return json(res,503,{error:'META_APP_SECRET is not configured on Railway. Add it to Variables, then retry.'});
+    const version=process.env.WHATSAPP_GRAPH_VERSION||'v23.0';
+    const tokenUrl='https://graph.facebook.com/'+version+'/oauth/access_token?client_id='+encodeURIComponent(appId)+'&client_secret='+encodeURIComponent(appSecret)+'&code='+encodeURIComponent(code);
+    const tokenResponse=await fetch(tokenUrl);
+    const tokenData=await tokenResponse.json().catch(()=>({}));
+    if(!tokenResponse.ok||!tokenData.access_token)throw new Error(tokenData?.error?.message||'Meta authorization code exchange failed.');
+    const session=body.session||{};
+    const wabaId=session.waba_id||session.wabaId||null;
+    const phoneNumberId=session.phone_number_id||session.phoneNumberId||null;
+    console.log('WhatsApp Embedded Signup completed:',JSON.stringify({wabaId,phoneNumberId,event:body.event||null,version:body.version||null,tokenReceived:true}));
+    return json(res,200,{success:true,wabaId,phoneNumberId,tokenReceived:true,message:'Meta authorization completed. If WHATSAPP_ACCESS_TOKEN is still the old token, replace it with the customer/system-user token from this onboarding before sending API messages.'});
+  }catch(e){
+    console.error('WhatsApp Embedded Signup error:',e.message);
+    return json(res,500,{error:e.message||'Unable to finalize WhatsApp Embedded Signup.'});
+  }
+}
 async function handleWhatsAppWebhook(req,res){
  return whatsapp.webhook(req,res,pool);
 }
 
 async function api(req,res){
- if(req.url&&req.url.startsWith('/api/whatsapp/webhook'))return handleWhatsAppWebhook(req,res);
+ if(req.url&&req.url.startsWith('/api/whatsapp/webhook'))return handleWhatsAppWebhook(req,res);\n if(req.method==='POST'&&req.url==='/api/whatsapp/embedded-signup')return handleWhatsAppEmbeddedSignup(req,res);
  if(req.method==='GET'&&req.url.startsWith('/api/ticket-pdf'))return whatsapp.pdf(req,res,pool);
  if(req.method==='GET'&&req.url==='/api/payment-status')return json(res,200,{configured:!!(process.env.RAZORPAY_KEY_ID&&process.env.RAZORPAY_KEY_SECRET),keyIdPresent:!!process.env.RAZORPAY_KEY_ID,keyPrefix:process.env.RAZORPAY_KEY_ID?String(process.env.RAZORPAY_KEY_ID).slice(0,8):null,secretPresent:!!process.env.RAZORPAY_KEY_SECRET});
  if(!process.env.RAZORPAY_KEY_ID||!process.env.RAZORPAY_KEY_SECRET)return json(res,500,{error:'Payment gateway is not configured yet.'});
