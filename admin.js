@@ -31,7 +31,7 @@ if(connectWhatsApp){
         showWhatsAppMessage('Meta login was cancelled or did not return an authorization code.');
       }
     },{
-      config_id:'258469885869946',
+      config_id:'2584698858699466',
       response_type:'code',
       override_default_response_type:true,
       extras:{setup:{},featureType:'whatsapp_business_app_onboarding',sessionInfoVersion:'3'}
