@@ -25,7 +25,7 @@ function showDigitalTicket(data){
   document.getElementById('passHolder').textContent=data.name;
   document.getElementById('passId').textContent=data.bookingId;
   const qr=document.getElementById('ticketQr'); qr.innerHTML='';
-  if(window.QRCode)new QRCode(qr,{text:'FANTASTIC|GARBA RAAS-RANG-18|'+data.bookingId+'|'+data.ticket+'|'+data.quantity,width:120,height:120,colorDark:'#171018',colorLight:'#ffffff'});
+  if(window.QRCode)new QRCode(qr,{text:window.location.origin+'/api/verify-ticket?id='+encodeURIComponent(data.bookingId),width:120,height:120,colorDark:'#171018',colorLight:'#ffffff'});
   const modal=document.getElementById('ticketPass');modal.classList.add('open');modal.setAttribute('aria-hidden','false');
 }
 function closeDigitalTicket(){const m=document.getElementById('ticketPass');m.classList.remove('open');m.setAttribute('aria-hidden','true');}
