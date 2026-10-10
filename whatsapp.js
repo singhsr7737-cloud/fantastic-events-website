@@ -116,7 +116,7 @@ async function handleIncoming(body,pool){
   if(!message?.from||message.type!=='text') return;
   const from=normalizePhone(message.from);
   const text=String(message.text?.body||'').trim();
-  const match=text.match(/\bFAN\d{6,12}\b/i);
+  const match=text.match(/\bFAN[A-Z0-9]{8,20}\b/i);
   let result;
   if(match){
     result=await pool.query('SELECT booking_id,holder_name,phone,pass_type,quantity FROM garba_bookings WHERE booking_id=$1 AND RIGHT(phone,10)=$2 LIMIT 1',[match[0].toUpperCase(),from]);
