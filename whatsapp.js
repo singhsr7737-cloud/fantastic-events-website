@@ -86,7 +86,7 @@ async function ticketPdfBuffer(booking){
     doc.roundedRect(570,298,302,204,14).fill('#40106f');
     doc.fillColor('#f9d96b').font('Helvetica-Bold').fontSize(17).text('SCAN TO VERIFY',590,311,{width:262,align:'center'});
     doc.roundedRect(655,338,132,132,8).fill('#ffffff');
-    doc.image(qr,663,346,{fit:[116,116});
+    doc.image(qr,663,346,{fit:[116,116]});
     doc.fillColor('#ffffff').font('Helvetica').fontSize(9).text('Unique QR · One-time entry check',590,478,{width:262,align:'center'});
 
     // Contact numbers at the bottom
