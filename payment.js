@@ -26,7 +26,7 @@ function showDigitalTicket(data){
   document.getElementById('passId').textContent=data.bookingId;
   const qr=document.getElementById('ticketQr'); qr.innerHTML='';
   if(window.QRCode)new QRCode(qr,{text:'FANTASTIC|GARBA RAAS-RANG-18|'+data.bookingId+'|'+data.ticket+'|'+data.quantity,width:120,height:120,colorDark:'#171018',colorLight:'#ffffff'});
-  const modal=document.getElementById('ticketPass');modal.classList.add('open');modal.setAttribute('aria-hidden','false'); const wb=document.getElementById('whatsappTicket'); if(wb) wb.onclick=openWhatsAppTicket;
+  const modal=document.getElementById('ticketPass');modal.classList.add('open');modal.setAttribute('aria-hidden','false');
 }
 function closeDigitalTicket(){const m=document.getElementById('ticketPass');m.classList.remove('open');m.setAttribute('aria-hidden','true');}
 document.getElementById('closeTicket').addEventListener('click',closeDigitalTicket);
@@ -35,15 +35,3 @@ document.querySelector('[data-close-ticket]').addEventListener('click',closeDigi
 document.getElementById('printTicket').addEventListener('click',()=>window.print());
 
 document.getElementById('emailTicket').addEventListener('click',async()=>{const id=document.getElementById('passId').textContent.trim();if(!lastBookingEmail){window.location.href='/recover-ticket.html';return;}const btn=document.getElementById('emailTicket'),old=btn.textContent;btn.disabled=true;btn.textContent='SENDING…';try{const r=await fetch('/api/recover-ticket',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({bookingId:id,email:lastBookingEmail})});const d=await r.json();if(!r.ok)throw new Error(d.error||'Unable to email ticket.');alert(d.message||'Please check your email.');}catch(e){alert(e.message||'Unable to email ticket. Please use Recover My Ticket.');}finally{btn.disabled=false;btn.textContent=old;}});
-function openWhatsAppTicket(){
- const id=document.getElementById('passId').textContent.trim();
- const holder=document.getElementById('passHolder').textContent.trim();
- const type=document.getElementById('passType').textContent.trim();
- const qty=document.getElementById('passQty').textContent.trim();
- const phoneInput=document.getElementById('customerPhone');
- const customerPhone=(phoneInput&&phoneInput.value||'').replace(/\D/g,'');
- const target='919929692498';
- const message='TICKET\n\nBooking ID: '+id+'\nHolder: '+holder+'\nPass: '+type+'\nQuantity: '+qty+'\nDate: 19 October 2026\nVenue: Kesargarh Haweli, Chomu\nTime: 5:00 PM - 11:00 PM';
- window.location.href='https://wa.me/'+target+'?text='+encodeURIComponent(message);
-}
-document.getElementById('whatsappTicket').addEventListener('click',openWhatsAppTicket);
