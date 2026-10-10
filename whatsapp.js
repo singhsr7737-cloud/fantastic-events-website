@@ -31,25 +31,82 @@ async function sendText(to,body){
 }
 async function ticketPdfBuffer(booking){
   const verify=baseUrl()+'/api/verify-ticket?id='+encodeURIComponent(booking.booking_id);
-  const data=await QRCode.toDataURL(verify,{margin:1,width:180});
+  const data=await QRCode.toDataURL(verify,{margin:1,width:220});
   const qr=Buffer.from(data.split(',')[1],'base64');
   return new Promise((resolve,reject)=>{
-    const doc=new PDFDocument({size:'A4',margin:42});
+    const doc=new PDFDocument({size:'A4',margin:0});
     const chunks=[];
     doc.on('data',c=>chunks.push(c));
     doc.on('end',()=>resolve(Buffer.concat(chunks)));
     doc.on('error',reject);
-    doc.fillColor('#7a3db8').fontSize(12).text('FANTASTIC',{align:'right'});
-    doc.moveDown(1).fillColor('#171018').fontSize(28).text('GARBA RAAS-RANG-18',{align:'center'});
-    doc.moveDown(.3).fontSize(16).text('ENTRY PASS',{align:'center'});
-    doc.moveDown(1).fontSize(11).text('19 OCTOBER 2026 | KESARGARH HAWELI, CHOMU | 5:00 PM - 11:00 PM',{align:'center'});
-    doc.moveDown(1.2).fontSize(12).text('PASS TYPE');doc.fontSize(18).text(booking.pass_type);
-    doc.moveDown(.4).fontSize(12).text('QUANTITY');doc.fontSize(18).text(String(booking.quantity));
-    doc.moveDown(.4).fontSize(12).text('HOLDER');doc.fontSize(18).text(booking.holder_name);
-    doc.moveDown(.4).fontSize(12).text('BOOKING ID');doc.fontSize(18).text(booking.booking_id);
-    doc.moveDown(1).image(qr,{fit:[140,140],align:'center'});
-    doc.moveDown(.4).fontSize(9).fillColor('#555').text('Scan the QR code to verify this ticket.',{align:'center'});
-    doc.moveDown(1).fillColor('#171018').fontSize(10).text('LIVE GARBA & DANDIYA | DJ & LIVE MUSIC | FOOD COURTS',{align:'center'});
+
+    const W=doc.page.width, H=doc.page.height;
+    // Warm, colourful page background
+    doc.rect(0,0,W,H).fill('#fff4e8');
+    // Soft decorative corner shapes
+    doc.circle(W-18,40,95).fill('#ffe0a8');
+    doc.circle(8,H-20,105).fill('#f7c7e5');
+
+    // Main pass card and shadow
+    const x=35,y=58,w=W-70,h=H-116;
+    doc.roundedRect(x+3,y+5,w,h,22).fill('#e4d7e8');
+    doc.roundedRect(x,y,w,h,22).fill('#ffffff');
+
+    // Colourful header band
+    doc.roundedRect(x,y,w,230,22).fill('#55218a');
+    doc.rect(x,y+205,w,25).fill('#55218a');
+    doc.rect(x,y+212,w,18).fill('#f05b48');
+    doc.circle(x+w-18,y+25,70).fill('#7d42b3');
+    doc.circle(x+w-18,y+25,45).fill('#f6b83f');
+
+    doc.fillColor('#ffe5a6').font('Helvetica-Bold').fontSize(12)
+      .text('FANTASTIC EVENTS',x+28,y+25,{characterSpacing:1.2});
+    doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(27)
+      .text('GARBA',x+28,y+65);
+    doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(22)
+      .text('RAAS-RANG-18',x+28,y+99);
+    doc.fillColor('#ffe5a6').font('Helvetica-Bold').fontSize(13)
+      .text('OFFICIAL ENTRY PASS',x+28,y+143);
+    doc.fillColor('#ffffff').font('Helvetica').fontSize(10)
+      .text('LIVE GARBA  •  DANDIYA  •  MUSIC  •  FOOD',x+28,y+177,{width:w-56});
+
+    // Event information strip
+    doc.roundedRect(x+22,y+250,w-44,76,12).fill('#fff0cf');
+    doc.fillColor('#55218a').font('Helvetica-Bold').fontSize(15)
+      .text('19 OCTOBER 2026',x+36,y+264);
+    doc.fillColor('#493b50').font('Helvetica').fontSize(11)
+      .text('Kesargarh Haweli, Chomu',x+36,y+287);
+    doc.fillColor('#493b50').font('Helvetica-Bold').fontSize(11)
+      .text('5:00 PM – 11:00 PM',x+36,y+304);
+
+    // Pass details
+    const left=x+28, right=x+w-190;
+    doc.fillColor('#8a7c91').font('Helvetica-Bold').fontSize(9).text('PASS TYPE',left,y+355);
+    doc.fillColor('#2c2034').font('Helvetica-Bold').fontSize(17)
+      .text(String(booking.pass_type||'Entry Pass'),left,y+372,{width:285});
+    doc.fillColor('#8a7c91').font('Helvetica-Bold').fontSize(9).text('QUANTITY',left,y+420);
+    doc.fillColor('#2c2034').font('Helvetica-Bold').fontSize(17)
+      .text(String(booking.quantity),left,y+437);
+    doc.fillColor('#8a7c91').font('Helvetica-Bold').fontSize(9).text('PASS HOLDER',left,y+480);
+    doc.fillColor('#2c2034').font('Helvetica-Bold').fontSize(15)
+      .text(String(booking.holder_name||'Guest'),left,y+497,{width:300});
+    doc.fillColor('#8a7c91').font('Helvetica-Bold').fontSize(9).text('BOOKING ID',left,y+543);
+    doc.fillColor('#f05b48').font('Helvetica-Bold').fontSize(16)
+      .text(String(booking.booking_id),left,y+560);
+
+    // QR verification panel
+    const qx=x+w-164,qy=y+365;
+    doc.roundedRect(qx-10,qy-10,132,160,12).fill('#f5edfa');
+    doc.image(qr,qx,qy,{fit:[112,112]});
+    doc.fillColor('#55218a').font('Helvetica-Bold').fontSize(9)
+      .text('SCAN TO VERIFY',qx-2,qy+119,{width:116,align:'center'});
+
+    // Footer
+    doc.moveTo(x+24,y+h-65).lineTo(x+w-24,y+h-65).lineWidth(1).strokeColor('#eadfed').stroke();
+    doc.fillColor('#55218a').font('Helvetica-Bold').fontSize(10)
+      .text('KEEP THIS PASS READY AT THE ENTRY GATE',x+22,y+h-50,{width:w-44,align:'center'});
+    doc.fillColor('#76677d').font('Helvetica').fontSize(8)
+      .text('Please show this QR code to the event team for ticket verification.',x+22,y+h-31,{width:w-44,align:'center'});
     doc.end();
   });
 }
