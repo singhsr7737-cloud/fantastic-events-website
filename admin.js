@@ -38,3 +38,47 @@ if(connectWhatsApp){
     });
   });
 }
+
+/* Multi-device entry gate scanner */
+let gateScanner=null,gateBusy=false;
+const scanResult=document.getElementById('scanResult');
+function showScanResult(message,kind){if(!scanResult)return;scanResult.textContent=message;scanResult.className='scan-result '+(kind||'');}
+function extractBookingId(value){
+  const raw=String(value||'').trim();
+  try{const u=new URL(raw);const id=u.searchParams.get('id');if(id)return id.trim().toUpperCase();}catch(e){}
+  const m=raw.match(/\bFAN[A-Z0-9]{8,20}\b/i);
+  return m?m[0].toUpperCase():'';
+}
+async function checkInBooking(raw){
+  if(gateBusy)return;
+  const id=extractBookingId(raw);
+  if(!id){showScanResult('INVALID QR / BOOKING ID. Please scan the ticket QR or enter its ID.','invalid');return;}
+  if(!adminPassword){showScanResult('Please log in to the admin panel first.','invalid');return;}
+  gateBusy=true;showScanResult('Checking ticket…','pending');
+  try{
+    const r=await fetch('/api/use-ticket',{method:'POST',headers:{'Content-Type':'application/json','x-admin-password':adminPassword},body:JSON.stringify({bookingId:id})});
+    const d=await r.json();
+    if(r.ok&&d.success){const b=d.booking||{};showScanResult('✓ VALID — ENTRY CHECKED IN\n'+(b.holder_name||'')+' · '+(b.pass_type||'')+' · Qty '+(b.quantity||'')+'\nBooking ID: '+(b.booking_id||id),'valid');await load();}
+    else if(d.status==='USED'){const b=d.booking||{};showScanResult('⛔ ALREADY USED — DO NOT ALLOW ENTRY\n'+(b.holder_name||'')+' · '+(b.pass_type||'')+'\nBooking ID: '+(b.booking_id||id),'used');}
+    else showScanResult('✕ INVALID TICKET — '+(d.error||'Booking not found.'),'invalid');
+  }catch(e){showScanResult('Unable to verify ticket. Check internet and try again.','invalid');}
+  finally{gateBusy=false;}
+}
+const checkBookingButton=document.getElementById('checkBooking');
+if(checkBookingButton)checkBookingButton.addEventListener('click',()=>{const input=document.getElementById('scanBookingId');checkInBooking(input.value);});
+const scanInput=document.getElementById('scanBookingId');
+if(scanInput)scanInput.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();checkInBooking(scanInput.value);}});
+const startScannerButton=document.getElementById('startScanner'),stopScannerButton=document.getElementById('stopScanner');
+async function stopGateScanner(){if(gateScanner){try{await gateScanner.stop();}catch(e){}try{await gateScanner.clear();}catch(e){}gateScanner=null;}if(startScannerButton)startScannerButton.hidden=false;if(stopScannerButton)stopScannerButton.hidden=true;}
+if(startScannerButton)startScannerButton.addEventListener('click',async()=>{
+ if(!adminPassword){showScanResult('Please log in to the admin panel first.','invalid');return;}
+ if(!window.Html5Qrcode){showScanResult('QR scanner library did not load. Use Booking ID field or refresh.','invalid');return;}
+ try{
+  gateScanner=new Html5Qrcode('qr-reader');
+  await gateScanner.start({facingMode:'environment'},{fps:10,qrbox:{width:230,height:230}},async decoded=>{
+   const id=extractBookingId(decoded);if(id){await stopGateScanner();await checkInBooking(id);}
+  },()=>{});
+  startScannerButton.hidden=true;stopScannerButton.hidden=false;showScanResult('Camera active. Point it at the ticket QR code.','pending');
+ }catch(e){gateScanner=null;showScanResult('Camera could not start. Allow camera access and use HTTPS, or enter the Booking ID manually.','invalid');}
+});
+if(stopScannerButton)stopScannerButton.addEventListener('click',stopGateScanner);
