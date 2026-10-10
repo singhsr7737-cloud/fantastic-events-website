@@ -110,4 +110,4 @@ async function pdf(req,res,pool){
     res.end(buffer);
   }catch(e){console.error('Ticket PDF error:',e.message);res.writeHead(500);res.end('Unable to generate ticket.');}
 }
-module.exports={webhook,pdf};
+module.exports={webhook,pdf,ticketPdfBuffer};
