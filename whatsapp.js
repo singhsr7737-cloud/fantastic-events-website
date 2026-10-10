@@ -32,7 +32,7 @@ async function sendText(to,body){
 }
 async function ticketPdfBuffer(booking){
   const verify=baseUrl()+'/api/verify-ticket?id='+encodeURIComponent(booking.booking_id);
-  const data=await QRCode.toDataURL(verify,{margin:1,width:300,errorCorrectionLevel:'H'});
+  const data=await QRCode.toDataURL(verify,{margin:1,width:320,errorCorrectionLevel:'H'});
   const qr=Buffer.from(data.split(',')[1],'base64');
   return new Promise((resolve,reject)=>{
     const doc=new PDFDocument({size:[900,600],margin:0,compress:true});
@@ -41,66 +41,57 @@ async function ticketPdfBuffer(booking){
     doc.on('end',()=>resolve(Buffer.concat(chunks)));
     doc.on('error',reject);
     const W=900,H=600;
-    // Clean cream background with a purple-and-gold festive frame
-    doc.rect(0,0,W,H).fill('#fff7e8');
-    doc.rect(0,0,W,12).fill('#40106f');
-    doc.rect(0,12,W,4).fill('#e8ad22');
-    doc.rect(0,H-16,W,12).fill('#40106f');
-    doc.rect(0,H-20,W,4).fill('#e8ad22');
-    // Subtle corner decorations
-    doc.circle(0,0,90).fill('#f8e3b7');
-    doc.circle(W,0,90).fill('#f8e3b7');
-    doc.circle(0,H,90).fill('#f8e3b7');
-    doc.circle(W,H,90).fill('#f8e3b7');
+    // Simple cream background, thin purple-and-gold frame
+    doc.rect(0,0,W,H).fill('#fffaf0');
+    doc.rect(0,0,W,10).fill('#40106f');
+    doc.rect(0,10,W,3).fill('#e8ad22');
+    doc.rect(0,H-13,W,10).fill('#40106f');
+    doc.rect(0,H-16,W,3).fill('#e8ad22');
 
-    // Header/logo: use the website's supplied logo asset, if available
+    // Company logo at the very top
     try {
-      doc.image(path.join(__dirname,'logo.png'),315,22,{fit:[270,72],align:'center',valign:'center'});
+      doc.image(path.join(__dirname,'logo.png'),365,20,{fit:[170,56],align:'center',valign:'center'});
     } catch(e) {
-      doc.fillColor('#40106f').font('Helvetica-Bold').fontSize(28).text('FANTASTIK',300,34,{width:300,align:'center'});
-      doc.fillColor('#40106f').font('Helvetica').fontSize(11).text('Events "N" Wedding Planner',300,67,{width:300,align:'center'});
+      doc.fillColor('#40106f').font('Helvetica-Bold').fontSize(23).text('FANTASTIK',300,31,{width:300,align:'center'});
+      doc.fillColor('#40106f').font('Helvetica').fontSize(9).text('Events \'N\' Wedding Planner',300,57,{width:300,align:'center'});
     }
-    doc.roundedRect(26,104,848,78,16).fill('#40106f');
-    doc.roundedRect(26,104,848,5,3).fill('#e8ad22');
-    doc.fillColor('#f9d96b').font('Helvetica-Bold').fontSize(13).text('18TH EDITION',45,119);
-    doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(30).text('GARBA RAAS-RANG 18',45,138);
-    doc.fillColor('#ffe9a6').font('Helvetica-Bold').fontSize(14).text('OFFICIAL ENTRY PASS',640,143,{width:210,align:'right'});
 
-    // Event details
-    doc.roundedRect(28,198,844,67,12).fill('#ffedc2');
-    doc.fillColor('#40106f').font('Helvetica-Bold').fontSize(16).text('MONDAY, 19 OCTOBER 2026',46,210);
-    doc.fillColor('#2c2034').font('Helvetica-Bold').fontSize(15).text('5 PM ONWARDS',46,235);
-    doc.fillColor('#40106f').font('Helvetica-Bold').fontSize(15).text('KESAR GARH HAVELI',360,210);
-    doc.fillColor('#2c2034').font('Helvetica').fontSize(13).text('Kacholiya Road, Chomu',360,235);
+    // Preserve the original event logo artwork without redrawing its text
+    try {
+      doc.image(path.join(__dirname,'file_00000000b1708211b93191b401dbc8cc.png'),270,82,{fit:[360,148],align:'center',valign:'center'});
+    } catch(e) {
+      doc.fillColor('#40106f').font('Helvetica-Bold').fontSize(25).text('GARBA रास-रंग 18',220,120,{width:460,align:'center'});
+    }
 
-    // Pass details panel
-    doc.roundedRect(28,281,520,235,16).lineWidth(2).strokeColor('#e8ad22').stroke();
-    doc.fillColor('#7a6687').font('Helvetica-Bold').fontSize(10).text('ATTENDEE NAME',48,301);
-    doc.fillColor('#24152e').font('Helvetica-Bold').fontSize(22).text(String(booking.holder_name||'Guest'),48,319,{width:465});
-    doc.moveTo(48,354).lineTo(525,354).lineWidth(1).strokeColor('#e8d9b7').stroke();
-    doc.fillColor('#7a6687').font('Helvetica-Bold').fontSize(10).text('PASS TYPE',48,370);
-    doc.fillColor('#24152e').font('Helvetica-Bold').fontSize(18).text(String(booking.pass_type||'Entry Pass'),48,387,{width:300});
-    doc.fillColor('#7a6687').font('Helvetica-Bold').fontSize(10).text('QUANTITY',365,370);
-    doc.fillColor('#24152e').font('Helvetica-Bold').fontSize(18).text(String(booking.quantity),365,387);
-    doc.moveTo(48,421).lineTo(525,421).lineWidth(1).strokeColor('#e8d9b7').stroke();
-    doc.fillColor('#7a6687').font('Helvetica-Bold').fontSize(10).text('UNIQUE BOOKING ID',48,438);
-    doc.fillColor('#d94732').font('Helvetica-Bold').fontSize(18).text(String(booking.booking_id),48,456,{width:465});
-    doc.fillColor('#5c4b63').font('Helvetica').fontSize(10).text('Keep this pass ready and show it at the entry gate.',48,490,{width:465});
+    // Simple pass heading and time (date/venue are already on the supplied event logo)
+    doc.roundedRect(28,238,844,44,12).fill('#40106f');
+    doc.fillColor('#f9d96b').font('Helvetica-Bold').fontSize(18).text('OFFICIAL ENTRY PASS',48,250);
+    doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(18).text('5 PM ONWARDS',570,250,{width:278,align:'right'});
 
-    // QR code and entry-pass badge
-    doc.roundedRect(570,198,302,318,16).fill('#40106f');
-    doc.fillColor('#f9d96b').font('Helvetica-Bold').fontSize(22).text('ENTRY PASS',590,218,{width:262,align:'center'});
-    doc.roundedRect(638,254,166,166,10).fill('#ffffff');
-    doc.image(qr,650,266,{fit:[142,142]});
-    doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(12).text('SCAN TO VERIFY',590,429,{width:262,align:'center'});
-    doc.roundedRect(592,456,258,40,10).fill('#c51e2d');
-    const isCouple=String(booking.pass_type||'').toLowerCase().includes('couple');
-    const validText=isCouple?'VALID FOR 2 PERSONS':String(booking.pass_type||'ENTRY PASS').toUpperCase();
-    doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(13).text(validText,602,469,{width:238,align:'center'});
+    // Customer-specific pass details
+    doc.roundedRect(28,298,520,204,14).lineWidth(1.5).strokeColor('#e8ad22').stroke();
+    doc.fillColor('#7a6687').font('Helvetica-Bold').fontSize(10).text('PASS HOLDER',48,316);
+    doc.fillColor('#24152e').font('Helvetica-Bold').fontSize(22).text(String(booking.holder_name||'Guest'),48,333,{width:465});
+    doc.moveTo(48,369).lineTo(525,369).lineWidth(1).strokeColor('#e8d9b7').stroke();
+    doc.fillColor('#7a6687').font('Helvetica-Bold').fontSize(10).text('PASS TYPE',48,384);
+    doc.fillColor('#24152e').font('Helvetica-Bold').fontSize(17).text(String(booking.pass_type||'Entry Pass'),48,401,{width:300});
+    doc.fillColor('#7a6687').font('Helvetica-Bold').fontSize(10).text('QUANTITY',365,384);
+    doc.fillColor('#24152e').font('Helvetica-Bold').fontSize(17).text(String(booking.quantity),365,401);
+    doc.moveTo(48,433).lineTo(525,433).lineWidth(1).strokeColor('#e8d9b7').stroke();
+    doc.fillColor('#7a6687').font('Helvetica-Bold').fontSize(10).text('UNIQUE BOOKING ID',48,447);
+    doc.fillColor('#d94732').font('Helvetica-Bold').fontSize(17).text(String(booking.booking_id),48,464,{width:465});
+    doc.fillColor('#5c4b63').font('Helvetica').fontSize(9).text('Keep this pass ready and show it at the entry gate.',48,485,{width:465});
 
-    // Contact footer
-    doc.fillColor('#40106f').font('Helvetica-Bold').fontSize(11).text('FOR QUERIES:  9929692498  |  9509566606',0,542,{width:W,align:'center'});
-    doc.fillColor('#786b7d').font('Helvetica').fontSize(9).text('This QR is unique to this booking. Each ticket is subject to entry verification.',0,560,{width:W,align:'center'});
+    // QR is unique to this booking and points to the live verification endpoint
+    doc.roundedRect(570,298,302,204,14).fill('#40106f');
+    doc.fillColor('#f9d96b').font('Helvetica-Bold').fontSize(17).text('SCAN TO VERIFY',590,311,{width:262,align:'center'});
+    doc.roundedRect(655,338,132,132,8).fill('#ffffff');
+    doc.image(qr,663,346,{fit:[116,116});
+    doc.fillColor('#ffffff').font('Helvetica').fontSize(9).text('Unique QR · One-time entry check',590,478,{width:262,align:'center'});
+
+    // Contact numbers at the bottom
+    doc.fillColor('#40106f').font('Helvetica-Bold').fontSize(12).text('FOR QUERIES:  9929692498  |  9509566606',0,530,{width:W,align:'center'});
+    doc.fillColor('#786b7d').font('Helvetica').fontSize(9).text('Valid only for the pass type and quantity shown. Entry is subject to QR verification.',0,551,{width:W,align:'center'});
     doc.end();
   });
 }
