@@ -63,6 +63,8 @@ async function ticketPdfBuffer(booking){
       doc.fillColor('#40106f').font('Helvetica-Bold').fontSize(25).text('GARBA रास-रंग 18',220,120,{width:460,align:'center'});
     }
 
+    doc.fillColor('#5c4b63').font('Helvetica-Bold').fontSize(12).text('19 OCTOBER 2026  |  KESARGARH HAWELI, CHOMU',100,166,{width:700,align:'center'});
+
     // Simple pass heading and time (date/venue are already on the supplied event logo)
     doc.roundedRect(28,238,844,44,12).fill('#40106f');
     doc.fillColor('#f9d96b').font('Helvetica-Bold').fontSize(18).text('OFFICIAL ENTRY PASS',48,250);
