@@ -50,7 +50,7 @@ async function ticketPdfBuffer(booking){
 
     // Company logo at the very top
     try {
-      doc.image(path.join(__dirname,'logo.png'),365,20,{fit:[170,56],align:'center',valign:'center'});
+      doc.image(path.join(__dirname,'logo.png'),365,20,{fit:[280,88],align:'center',valign:'center'});
     } catch(e) {
       doc.fillColor('#40106f').font('Helvetica-Bold').fontSize(23).text('FANTASTIK',300,31,{width:300,align:'center'});
       doc.fillColor('#40106f').font('Helvetica').fontSize(9).text('Events \'N\' Wedding Planner',300,57,{width:300,align:'center'});
@@ -58,7 +58,7 @@ async function ticketPdfBuffer(booking){
 
     // Preserve the original event logo artwork without redrawing its text
     try {
-      doc.image(path.join(__dirname,'file_00000000b1708211b93191b401dbc8cc.png'),270,82,{fit:[360,148],align:'center',valign:'center'});
+      doc.image(path.join(__dirname,'removed-event-logo.png'),270,82,{fit:[360,148],align:'center',valign:'center'});
     } catch(e) {
       doc.fillColor('#40106f').font('Helvetica-Bold').fontSize(25).text('GARBA रास-रंग 18',220,120,{width:460,align:'center'});
     }
@@ -66,7 +66,7 @@ async function ticketPdfBuffer(booking){
     // Simple pass heading and time (date/venue are already on the supplied event logo)
     doc.roundedRect(28,238,844,44,12).fill('#40106f');
     doc.fillColor('#f9d96b').font('Helvetica-Bold').fontSize(18).text('OFFICIAL ENTRY PASS',48,250);
-    doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(18).text('5 PM ONWARDS',570,250,{width:278,align:'right'});
+    doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(18).text('6 PM ONWARDS',570,250,{width:278,align:'right'});
 
     // Customer-specific pass details
     doc.roundedRect(28,298,520,204,14).lineWidth(1.5).strokeColor('#e8ad22').stroke();
