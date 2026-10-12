@@ -84,3 +84,25 @@ if(startScannerButton)startScannerButton.addEventListener('click',async()=>{
 if(stopScannerButton)stopScannerButton.addEventListener('click',stopGateScanner);
 
 const generateCoupon=document.getElementById('generateCoupon');const couponMsg=document.getElementById('couponMsg');const couponResult=document.getElementById('couponResult');let latestCoupon='';if(generateCoupon){generateCoupon.addEventListener('click',async()=>{generateCoupon.disabled=true;couponMsg.textContent='Generating unique code…';couponResult.hidden=true;try{const r=await fetch('/api/admin/coupons',{method:'POST',headers:{'Content-Type':'application/json','x-admin-password':adminPassword},body:JSON.stringify({discount:Number(document.getElementById('couponDiscount').value)})});const d=await r.json();if(!r.ok)throw new Error(d.error||'Could not generate coupon.');latestCoupon=d.code;document.getElementById('couponCodeResult').textContent=d.code;document.getElementById('couponDiscountResult').textContent=' — ₹'+d.discount+' off · single use';couponResult.hidden=false;couponMsg.textContent='Give this code only to the intended customer. It can be used once.';}catch(e){couponMsg.textContent=e.message;}finally{generateCoupon.disabled=false;}});document.getElementById('copyCoupon').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(latestCoupon);couponMsg.textContent='Coupon copied: '+latestCoupon;}catch(e){couponMsg.textContent='Copy failed. Please copy manually: '+latestCoupon;}});}
+
+
+/* Complimentary VIP pass generator */
+const generateVip=document.getElementById('generateVip');
+if(generateVip){
+ const vipMsg=document.getElementById('vipMsg'),vipResult=document.getElementById('vipResult');
+ let latestVipId='';
+ generateVip.addEventListener('click',async()=>{
+  const name=document.getElementById('vipName').value.trim(),phone=document.getElementById('vipPhone').value.trim(),email=document.getElementById('vipEmail').value.trim();
+  if(!name||!/^\\d{10}$/.test(phone)){vipMsg.textContent='Enter guest name and a valid 10-digit mobile number.';return;}
+  generateVip.disabled=true;vipMsg.textContent='Creating free VIP pass…';vipResult.hidden=true;
+  try{
+   const r=await fetch('/api/admin/free-vip-pass',{method:'POST',headers:{'Content-Type':'application/json','x-admin-password':adminPassword},body:JSON.stringify({name,phone,email})});
+   const d=await r.json();if(!r.ok)throw new Error(d.error||'Unable to create VIP pass.');
+   latestVipId=d.bookingId;document.getElementById('vipBookingId').textContent=d.bookingId;
+   document.getElementById('openVipPdf').href='/api/ticket-pdf?id='+encodeURIComponent(d.bookingId);
+   document.getElementById('vipEmailStatus').textContent=d.emailSent?'Ticket PDF emailed to '+email+'.':'Email not sent. Open/print the PDF or share the Booking ID with the guest.';
+   vipResult.hidden=false;vipMsg.textContent='Free VIP pass created successfully.';await load();
+  }catch(e){vipMsg.textContent=e.message;}finally{generateVip.disabled=false;}
+ });
+ document.getElementById('copyVipId').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(latestVipId);vipMsg.textContent='Booking ID copied: '+latestVipId;}catch(e){vipMsg.textContent='Copy manually: '+latestVipId;}});
+}
