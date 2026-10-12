@@ -50,15 +50,15 @@ async function ticketPdfBuffer(booking){
 
     // Company logo at the very top
     try {
-      doc.image(path.join(__dirname,'logo.png'),365,20,{fit:[280,88],align:'center',valign:'center'});
+      doc.image(path.join(__dirname,'logo.png'),270,15,{fit:[360,110],align:'center',valign:'center'});
     } catch(e) {
       doc.fillColor('#40106f').font('Helvetica-Bold').fontSize(23).text('FANTASTIK',300,31,{width:300,align:'center'});
       doc.fillColor('#40106f').font('Helvetica').fontSize(9).text('Events \'N\' Wedding Planner',300,57,{width:300,align:'center'});
     }
 
     // Event title beneath company logo, without event artwork
-    doc.fillColor('#40106f').font('Helvetica-Bold').fontSize(25).text('GARBA RAAS-RANG-18',220,120,{width:460,align:'center'});
-    doc.fillColor('#5c4b63').font('Helvetica-Bold').fontSize(12).text('19 OCTOBER 2026 | KESARGARH HAWELI, CHOMU',220,158,{width:460,align:'center'});
+    doc.fillColor('#40106f').font('Helvetica-Bold').fontSize(25).text('GARBA RAAS-RANG-18',220,140,{width:460,align:'center'});
+    doc.fillColor('#5c4b63').font('Helvetica-Bold').fontSize(12).text('19 OCTOBER 2026 | KESARGARH HAWELI, CHOMU',220,177,{width:460,align:'center'});
 
     // Entry pass heading and updated event time
     doc.roundedRect(28,238,844,44,12).fill('#40106f');
