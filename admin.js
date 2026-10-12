@@ -93,7 +93,7 @@ if(generateVip){
  let latestVipId='';
  generateVip.addEventListener('click',async()=>{
   const name=document.getElementById('vipName').value.trim(),phone=document.getElementById('vipPhone').value.trim(),email=document.getElementById('vipEmail').value.trim();
-  if(!name||!/^\\d{10}$/.test(phone)){vipMsg.textContent='Enter guest name and a valid 10-digit mobile number.';return;}
+  if(!name||!/^\d{10}$/.test(phone)){vipMsg.textContent='Enter guest name and a valid 10-digit mobile number.';return;}
   generateVip.disabled=true;vipMsg.textContent='Creating free VIP pass…';vipResult.hidden=true;
   try{
    const r=await fetch('/api/admin/free-vip-pass',{method:'POST',headers:{'Content-Type':'application/json','x-admin-password':adminPassword},body:JSON.stringify({name,phone,email})});
