@@ -9,7 +9,7 @@ const ticketEmail=require('./email');
 const root=__dirname;
 const port=process.env.PORT||3000;
 const types={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'application/javascript; charset=utf-8','.json':'application/json; charset=utf-8','.jpg':'image/jpeg','.jpeg':'image/jpeg','.png':'image/png','.webp':'image/webp','.svg':'image/svg+xml','.mp4':'video/mp4','.mov':'video/quicktime','.ico':'image/x-icon'};
-const prices={'Single Female Pass':399,'Couple Pass':599,'Family Pass':999};
+const prices={'Single Female Pass':350,'Couple Pass':599,'Family Pass':799};
 function discountFor(discount,subtotal){return Math.min(subtotal,Math.max(0,Number(discount)||0));}
 const razorpay=()=>new Razorpay({key_id:process.env.RAZORPAY_KEY_ID,key_secret:process.env.RAZORPAY_KEY_SECRET});
 const pool=process.env.DATABASE_URL?new Pool({connectionString:process.env.DATABASE_URL,ssl:{rejectUnauthorized:false}}):null;
