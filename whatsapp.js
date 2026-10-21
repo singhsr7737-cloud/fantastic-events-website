@@ -58,7 +58,7 @@ async function ticketPdfBuffer(booking){
 
     // Event title beneath company logo, without event artwork
     doc.fillColor('#40106f').font('Helvetica-Bold').fontSize(25).text('GARBA RAAS-RANG-18',220,140,{width:460,align:'center'});
-    doc.fillColor('#5c4b63').font('Helvetica-Bold').fontSize(12).text('19 OCTOBER 2026 | KESARGARH HAWELI, CHOMU',220,177,{width:460,align:'center'});
+    doc.fillColor('#5c4b63').font('Helvetica-Bold').fontSize(12).text('26 OCTOBER 2026 | KESARGARH HAWELI, CHOMU',220,177,{width:460,align:'center'});
 
     // Entry pass heading and updated event time
     doc.roundedRect(28,238,844,44,12).fill('#40106f');
