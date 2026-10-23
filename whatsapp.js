@@ -41,34 +41,41 @@ async function ticketPdfBuffer(booking){
     doc.on('end',()=>resolve(Buffer.concat(chunks)));
     doc.on('error',reject);
     const W=900,H=600;
-    // Poster background for all generated ticket PDFs.
     const posterPath=path.join(__dirname,'WhatsApp Image 2026-10-21 at 9.15.57 PM (1).jpeg');
-    try { doc.image(posterPath,0,0,{width:W,height:H}); } catch(e) { doc.rect(0,0,W,H).fill('#fffaf0'); }
-    doc.rect(18,18,W-36,H-36).lineWidth(4).strokeColor('#e8ad22').stroke();
-    // Keep the original Garba poster clearly visible; use only a light translucent wash.
-    doc.roundedRect(30,55,840,490,18).fillOpacity(0.12).fill('#fffaf0').fillOpacity(1);
-    doc.roundedRect(30,55,840,490,18).lineWidth(2).strokeColor('#40106f').strokeOpacity(0.65).stroke();
-    doc.roundedRect(48,75,804,54,12).fill('#40106f');
-    doc.fillColor('#f9d96b').font('Helvetica-Bold').fontSize(22).text('ENTRY PASS',68,91);
-    doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(20).text('6:00 PM ONWARDS',500,91,{width:330,align:'right'});
-    doc.fillColor('#7a6687').font('Helvetica-Bold').fontSize(12).text('PASS HOLDER',62,157);
-    doc.fillColor('#24152e').font('Helvetica-Bold').fontSize(27).text(String(booking.holder_name||'Guest'),62,178,{width:490});
-    doc.moveTo(62,224).lineTo(535,224).lineWidth(1.5).strokeColor('#e8d9b7').stroke();
-    doc.fillColor('#7a6687').font('Helvetica-Bold').fontSize(12).text('PASS TYPE',62,245);
-    doc.fillColor('#24152e').font('Helvetica-Bold').fontSize(20).text(String(booking.pass_type||'Entry Pass'),62,267,{width:330});
-    doc.fillColor('#7a6687').font('Helvetica-Bold').fontSize(12).text('QUANTITY',410,245);
-    doc.fillColor('#24152e').font('Helvetica-Bold').fontSize(20).text(String(booking.quantity),410,267);
-    doc.moveTo(62,312).lineTo(535,312).lineWidth(1.5).strokeColor('#e8d9b7').stroke();
-    doc.fillColor('#7a6687').font('Helvetica-Bold').fontSize(12).text('BOOKING / PASS ID',62,333);
-    doc.fillColor('#d94732').font('Helvetica-Bold').fontSize(21).text(String(booking.booking_id),62,356,{width:465});
-    doc.fillColor('#5c4b63').font('Helvetica').fontSize(11).text('Keep this pass ready and show it at the entry gate.',62,402,{width:465});
-    doc.roundedRect(590,157,235,300,14).fill('#40106f');
-    doc.fillColor('#f9d96b').font('Helvetica-Bold').fontSize(17).text('SCAN TO VERIFY',607,176,{width:201,align:'center'});
-    doc.roundedRect(635,218,145,145,8).fill('#ffffff');
-    doc.image(qr,644,227,{fit:[127,127]});
-    doc.fillColor('#ffffff').font('Helvetica').fontSize(10).text('Unique QR - One-time entry check',607,384,{width:201,align:'center'});
-    doc.fillColor('#40106f').font('Helvetica-Bold').fontSize(13).text('FANTASTIC EVENTS',0,495,{width:W,align:'center'});
-    doc.fillColor('#5c4b63').font('Helvetica').fontSize(10).text('Valid only for the pass type and quantity shown. Entry is subject to QR verification.',0,518,{width:W,align:'center'});
+    try { doc.image(posterPath,0,0,{width:W,height:H}); } catch(e) { doc.rect(0,0,W,H).fill('#160c25'); }
+
+    // Clean, intentional ticket layout: preserve the poster as the full-bleed background,
+    // while giving all variable details and the QR code their own readable panels.
+    doc.rect(14,14,W-28,H-28).lineWidth(4).strokeColor('#f4c84a').stroke();
+    doc.roundedRect(34,34,832,62,14).fill('#35105c');
+    doc.fillColor('#f9d96b').font('Helvetica-Bold').fontSize(25).text('FANTASTIC  |  ENTRY PASS',56,52,{width:490});
+    doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(18).text('6:00 PM ONWARDS',570,57,{width:270,align:'right'});
+
+    // Holder details panel on the left: opaque enough for contrast, not a full-page wash.
+    doc.roundedRect(36,116,520,332,18).fillOpacity(0.90).fill('#25103f').fillOpacity(1);
+    doc.roundedRect(36,116,520,332,18).lineWidth(2).strokeColor('#f1c64b').stroke();
+    doc.fillColor('#f9d96b').font('Helvetica-Bold').fontSize(12).text('PASS HOLDER',62,142);
+    doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(27).text(String(booking.holder_name||'Guest'),62,164,{width:465,height:66, ellipsis:true});
+    doc.moveTo(62,226).lineTo(526,226).lineWidth(1).strokeColor('#745b8d').stroke();
+    doc.fillColor('#d9c9ef').font('Helvetica-Bold').fontSize(12).text('PASS TYPE',62,246);
+    doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(20).text(String(booking.pass_type||'Entry Pass'),62,267,{width:455,height:42,ellipsis:true});
+    doc.fillColor('#d9c9ef').font('Helvetica-Bold').fontSize(12).text('QUANTITY',62,322);
+    doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(20).text(String(booking.quantity),62,343);
+    doc.moveTo(62,380).lineTo(526,380).lineWidth(1).strokeColor('#745b8d').stroke();
+    doc.fillColor('#f9d96b').font('Helvetica-Bold').fontSize(11).text('BOOKING / PASS ID',62,397);
+    doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(18).text(String(booking.booking_id),62,416,{width:455,height:24,ellipsis:true});
+
+    // QR is isolated on the right and never overlaps holder information.
+    doc.roundedRect(592,116,272,332,18).fillOpacity(0.96).fill('#35105c').fillOpacity(1);
+    doc.roundedRect(592,116,272,332,18).lineWidth(2).strokeColor('#f1c64b').stroke();
+    doc.fillColor('#f9d96b').font('Helvetica-Bold').fontSize(17).text('SCAN TO VERIFY',610,139,{width:236,align:'center'});
+    doc.roundedRect(638,174,180,180,10).fill('#ffffff');
+    doc.image(qr,648,184,{fit:[160,160]});
+    doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(11).text('UNIQUE ENTRY QR',610,370,{width:236,align:'center'});
+    doc.fillColor('#e7d9f3').font('Helvetica').fontSize(10).text('Keep this pass ready at the entry gate.',610,390,{width:236,align:'center'});
+    doc.fillColor('#35105c').font('Helvetica-Bold').fontSize(12).text('GARBA RAAS-RANG 18',0,478,{width:W,align:'center'});
+    doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(12).text('26 OCTOBER 2026  |  KESARGARH HAWELI, CHOMU',0,498,{width:W,align:'center'});
+    doc.fillColor('#ffffff').font('Helvetica').fontSize(10).text('Valid only for the pass type and quantity shown. Entry is subject to QR verification.',0,520,{width:W,align:'center'});
     doc.end();
   });
 }
