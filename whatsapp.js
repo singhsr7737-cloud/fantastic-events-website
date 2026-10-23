@@ -44,28 +44,29 @@ async function ticketPdfBuffer(booking){
     const posterPath=path.join(__dirname,'WhatsApp Image 2026-10-21 at 9.15.57 PM (1).jpeg');
     try { doc.image(posterPath,0,0,{width:W,height:H}); } catch(e) { doc.rect(0,0,W,H).fill('#160c25'); }
 
-    // Preserve the original poster artwork and all printed event details.
-    // Add booking information only in the open red space at the top-left,
-    // and put the QR in the open red space at the top-right. Leave the center,
-    // event logo, date and venue plaque unobstructed.
-    doc.roundedRect(20,28,238,180,12).fillOpacity(0.86).fill('#281044').fillOpacity(1);
-    doc.roundedRect(20,28,238,180,12).lineWidth(1.5).strokeColor('#f1c64b').stroke();
-    doc.fillColor('#f9d96b').font('Helvetica-Bold').fontSize(9).text('PASS HOLDER',34,39,{width:210});
-    doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(15).text(String(booking.holder_name||'Guest'),34,52,{width:210,height:34,ellipsis:true});
-    doc.moveTo(34,89).lineTo(244,89).lineWidth(0.7).strokeColor('#806394').stroke();
-    doc.fillColor('#f9d96b').font('Helvetica-Bold').fontSize(9).text('PASS TYPE',34,98);
-    doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(12).text(String(booking.pass_type||'Entry Pass'),34,111,{width:210,height:27,ellipsis:true});
-    doc.fillColor('#f9d96b').font('Helvetica-Bold').fontSize(9).text('QUANTITY',34,143);
-    doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(13).text(String(booking.quantity),34,155);
-    doc.fillColor('#f9d96b').font('Helvetica-Bold').fontSize(8).text('BOOKING / PASS ID',93,145,{width:145});
-    doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(9).text(String(booking.booking_id),93,159,{width:145,height:28,ellipsis:true});
+    // Keep the original poster, logos, central Garba title, date and venue untouched.
+    // Holder stays at the top-left; all remaining booking details move to bottom-left;
+    // QR sits bottom-right in its own panel.
+    doc.roundedRect(20,28,238,78,11).fillOpacity(0.88).fill('#281044').fillOpacity(1);
+    doc.roundedRect(20,28,238,78,11).lineWidth(1.5).strokeColor('#f1c64b').stroke();
+    doc.fillColor('#f9d96b').font('Helvetica-Bold').fontSize(10).text('PASS HOLDER',34,40,{width:210});
+    doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(15).text(String(booking.holder_name||'Guest'),34,57,{width:210,height:34,ellipsis:true});
 
-    doc.roundedRect(654,28,226,180,12).fillOpacity(0.91).fill('#281044').fillOpacity(1);
-    doc.roundedRect(654,28,226,180,12).lineWidth(1.5).strokeColor('#f1c64b').stroke();
-    doc.fillColor('#f9d96b').font('Helvetica-Bold').fontSize(12).text('SCAN TO VERIFY',666,39,{width:202,align:'center'});
-    doc.roundedRect(704,58,126,126,7).fill('#ffffff');
-    doc.image(qr,710,64,{fit:[114,114]});
-    doc.fillColor('#ffffff').font('Helvetica').fontSize(8).text('Unique QR · Entry verification',662,189,{width:210,align:'center'});
+    doc.roundedRect(20,444,286,132,11).fillOpacity(0.90).fill('#281044').fillOpacity(1);
+    doc.roundedRect(20,444,286,132,11).lineWidth(1.5).strokeColor('#f1c64b').stroke();
+    doc.fillColor('#f9d96b').font('Helvetica-Bold').fontSize(9).text('PASS TYPE',34,456);
+    doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(12).text(String(booking.pass_type||'Entry Pass'),34,470,{width:255,height:25,ellipsis:true});
+    doc.fillColor('#f9d96b').font('Helvetica-Bold').fontSize(9).text('QUANTITY',34,500);
+    doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(13).text(String(booking.quantity),34,513);
+    doc.fillColor('#f9d96b').font('Helvetica-Bold').fontSize(9).text('BOOKING / PASS ID',104,500,{width:185});
+    doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(10).text(String(booking.booking_id),104,513,{width:185,height:30,ellipsis:true});
+    doc.fillColor('#e7d9f3').font('Helvetica').fontSize(8).text('Keep this pass ready for entry.',34,551,{width:250});
+
+    doc.roundedRect(696,420,184,156,11).fillOpacity(0.94).fill('#281044').fillOpacity(1);
+    doc.roundedRect(696,420,184,156,11).lineWidth(1.5).strokeColor('#f1c64b').stroke();
+    doc.fillColor('#f9d96b').font('Helvetica-Bold').fontSize(10).text('SCAN TO VERIFY',706,430,{width:164,align:'center'});
+    doc.roundedRect(732,448,112,112,6).fill('#ffffff');
+    doc.image(qr,737,453,{fit:[102,102]});
     doc.end();
   });
 }
