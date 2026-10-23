@@ -45,8 +45,9 @@ async function ticketPdfBuffer(booking){
     const posterPath=path.join(__dirname,'WhatsApp Image 2026-10-21 at 9.15.57 PM (1).jpeg');
     try { doc.image(posterPath,0,0,{width:W,height:H}); } catch(e) { doc.rect(0,0,W,H).fill('#fffaf0'); }
     doc.rect(18,18,W-36,H-36).lineWidth(4).strokeColor('#e8ad22').stroke();
-    doc.roundedRect(30,55,840,490,18).fillOpacity(0.92).fill('#fffaf0').fillOpacity(1);
-    doc.roundedRect(30,55,840,490,18).lineWidth(3).strokeColor('#40106f').stroke();
+    // Keep the original Garba poster clearly visible; use only a light translucent wash.
+    doc.roundedRect(30,55,840,490,18).fillOpacity(0.12).fill('#fffaf0').fillOpacity(1);
+    doc.roundedRect(30,55,840,490,18).lineWidth(2).strokeColor('#40106f').strokeOpacity(0.65).stroke();
     doc.roundedRect(48,75,804,54,12).fill('#40106f');
     doc.fillColor('#f9d96b').font('Helvetica-Bold').fontSize(22).text('ENTRY PASS',68,91);
     doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(20).text('6:00 PM ONWARDS',500,91,{width:330,align:'right'});
