@@ -62,12 +62,63 @@ async function handleWhatsAppEmbeddedSignup(req,res){
     return json(res,500,{error:e.message||'Unable to finalize WhatsApp Embedded Signup.'});
   }
 }
+async function handleRazorpayWebhook(req,res){
+ try{
+  const secret=process.env.RAZORPAY_WEBHOOK_SECRET;
+  if(!secret)return json(res,503,{error:'Razorpay webhook secret is not configured.'});
+  let raw='';
+  for await(const chunk of req)raw+=chunk;
+  const signature=String(req.headers['x-razorpay-signature']||'');
+  const expected=crypto.createHmac('sha256',secret).update(raw).digest('hex');
+  if(!signature||signature.length!==expected.length||!crypto.timingSafeEqual(Buffer.from(signature),Buffer.from(expected)))return json(res,400,{error:'Invalid webhook signature.'});
+  const event=JSON.parse(raw||'{}');
+  if(!['payment.captured','order.paid'].includes(event.event))return json(res,200,{received:true,ignored:true});
+  const payment=event.payload?.payment?.entity||null;
+  const orderEntity=event.payload?.order?.entity||null;
+  const orderId=payment?.order_id||orderEntity?.id;
+  const paymentId=payment?.id||null;
+  if(!orderId)return json(res,200,{received:true,ignored:true,reason:'No order ID'});
+  if(!pool)return json(res,503,{error:'Booking database is unavailable.'});
+  const order=await razorpay().orders.fetch(orderId);
+  const notes=order.notes||{};
+  const existing=await pool.query('SELECT booking_id FROM garba_bookings WHERE order_id=$1 OR ($2::text IS NOT NULL AND payment_id=$2) LIMIT 1',[orderId,paymentId]);
+  if(existing.rowCount)return json(res,200,{received:true,alreadyBooked:true,bookingId:existing.rows[0].booking_id});
+  if(payment?.status&&payment.status!=='captured'&&event.event!=='order.paid')return json(res,200,{received:true,ignored:true,reason:'Payment is not captured'});
+  const ticket=String(notes.ticket||'');
+  const quantity=Math.min(10,Math.max(1,Number(notes.quantity)||1));
+  const price=prices[ticket];
+  const discount=Math.max(0,Number(notes.discount)||0);
+  if(!price||Number(order.amount)!==(price*quantity-discount)*100){
+    console.error('Razorpay webhook needs manual reconciliation:',JSON.stringify({orderId,paymentId,event:event.event,ticket,quantity,amount:order.amount}));
+    return json(res,200,{received:true,manualReconciliation:true});
+  }
+  const bookingId='FAN'+Date.now().toString().slice(-8)+crypto.randomBytes(3).toString('hex').toUpperCase();
+  const booking={booking_id:bookingId,holder_name:String(notes.name||'Guest').trim(),phone:String(notes.phone||payment?.contact||'').replace(/\D/g,'').slice(-10),email:String(notes.email||payment?.email||'').trim(),pass_type:ticket,quantity,amount:Number(order.amount)/100};
+  await pool.query('INSERT INTO garba_bookings (booking_id,payment_id,order_id,holder_name,phone,email,pass_type,quantity,amount) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)',[bookingId,paymentId,orderId,booking.holder_name,booking.phone,booking.email,booking.pass_type,booking.quantity,booking.amount]);
+  const couponCode=String(notes.couponCode||'').trim().toUpperCase();
+  if(couponCode){
+   try{await pool.query("UPDATE ticket_coupons SET status='used',used_at=NOW() WHERE code=$1 AND order_id=$2 AND status IN ('reserved','available')",[couponCode,orderId]);}
+   catch(e){console.error('Razorpay webhook coupon update failed:',e.message,'bookingId:',bookingId);}
+  }
+  if(booking.email&&process.env.RESEND_API_KEY&&process.env.RESEND_FROM_EMAIL){
+   try{await ticketEmail.sendTicketEmail(booking);}
+   catch(e){console.error('Webhook ticket email failed:',e.message,'bookingId:',bookingId);}
+  }else{
+   console.error('Webhook created booking but email could not be sent (missing email/config). bookingId:',bookingId);
+  }
+  console.log('Razorpay webhook booking created:',JSON.stringify({bookingId,orderId,paymentId,emailSent:!!(booking.email&&process.env.RESEND_API_KEY&&process.env.RESEND_FROM_EMAIL)}));
+  return json(res,200,{received:true,bookingId});
+ }catch(e){
+  console.error('Razorpay webhook error:',e.message);
+  return json(res,500,{error:'Webhook processing failed.'});
+ }
+}
 async function handleWhatsAppWebhook(req,res){
  return whatsapp.webhook(req,res,pool);
 }
 
 async function api(req,res){
- if(req.url&&req.url.startsWith('/api/whatsapp/webhook'))return handleWhatsAppWebhook(req,res);
+ if(req.method==='POST'&&req.url==='/api/razorpay/webhook')return handleRazorpayWebhook(req,res);\n if(req.url&&req.url.startsWith('/api/whatsapp/webhook'))return handleWhatsAppWebhook(req,res);
  if(req.method==='POST'&&req.url==='/api/whatsapp/embedded-signup')return handleWhatsAppEmbeddedSignup(req,res);
  if(req.method==='GET'&&req.url.startsWith('/api/ticket-pdf'))return whatsapp.pdf(req,res,pool);
  if(req.method==='POST'&&req.url==='/api/recover-ticket'){try{const d=await readBody(req);const lookup=String(d.lookup||'').trim();if(!lookup||lookup.length>120)return json(res,400,{error:'Please enter your registered mobile number or email address.'});if(!pool)return json(res,503,{error:'Booking database is not configured.'});if(!process.env.RESEND_API_KEY||!process.env.RESEND_FROM_EMAIL)return json(res,503,{error:'Email service is not configured yet. Please contact FANTASTIC Events.'});let r;if(lookup.includes('@')){const email=lookup.toLowerCase();if(!/^\S+@\S+\.\S+$/.test(email))return json(res,400,{error:'Please enter a valid email address or mobile number.'});r=await pool.query('SELECT booking_id,holder_name,email,pass_type,quantity FROM garba_bookings WHERE LOWER(email)=LOWER($1) ORDER BY created_at DESC LIMIT 10',[email]);}else{const phone=lookup.replace(/\D/g,'');if(!/^\d{10,13}$/.test(phone))return json(res,400,{error:'Please enter a valid registered mobile number or email address.'});const last10=phone.slice(-10);r=await pool.query("SELECT booking_id,holder_name,email,pass_type,quantity FROM garba_bookings WHERE RIGHT(regexp_replace(phone, '\\D', '', 'g'), 10)=$1 ORDER BY created_at DESC LIMIT 10",[last10]);}for(const booking of r.rows){await ticketEmail.sendTicketEmail(booking);}return json(res,200,{success:true,message:'If matching bookings are found, ticket PDFs will be sent to the registered email address(es). Please check Inbox and Spam.'});}catch(e){console.error('Ticket recovery error:',e.message);return json(res,500,{error:'Unable to send the ticket right now. Please contact FANTASTIC Events.'});}}
